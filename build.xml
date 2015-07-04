@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<project name="OfflineFictionManager_Build" default="main" basedir=".">
+
+	<!-- This lets us use testng via ant to automate tests on commit -->
+	<taskdef name="testng" classname="org.testng.TestNGAntTask">
+		<classpath>
+			<pathelement location="external_lib/testng/testng.jar"/>
+		</classpath>
+	</taskdef>
+	
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src.dir" location="src" />	
+	<property name="build.dir" location="bin" />
+	<property name="dist.dir" location="dist" />
+	<property name="docs.dir" location="docs" />
+	
+	<property name="test.dir" location="test" />
+	<property name="testbuild.dir" location="testbin" />
+	<property name="testng.report.dir" location="test-output" />
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${docs.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${testbuild.dir}" />
+		<delete dir="${testng.report.dir}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${testbuild.dir}" />
+		<mkdir dir="${testng.report.dir}" />
+	</target>
+
+	<!-- Compiles the java source code -->
+	<target name="compileSrc" depends="clean, makedir">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" />
+	</target>
+	
+	<!-- Compiles the TestNG unit test source files -->
+	<target name="compileTest" depends="compileSrc">
+		<javac 	srcdir="${test.dir}"
+				destdir="${testbuild.dir}"
+				classpath="external_lib/testng/testng.jar;${build.dir}"
+				includeantruntime="false" />
+	</target>
+
+	<!-- Creates Javadoc -->
+	<target name="docs" depends="compileSrc">
+		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
+			<!-- Define which files / directory should get included, we include all -->
+			<fileset dir="${src.dir}">
+				<include name="**" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<!--Creates the deployable jar file  -->
+	<target name="jar" depends="compileSrc">
+		<jar destfile="${dist.dir}\OfflineFictionManager.jar" basedir="${build.dir}">
+		</jar>
+	</target>
+
+	<target name="test" depends="compileTest">
+		<testng outputDir="${testng.report.dir}"
+		        haltOnFailure="true" verbose="2">
+			<classpath location="${testbuild.dir}" />
+			<classpath location="${build.dir}" />
+			<classfileset dir="${testbuild.dir}" includes="**\*.class" />
+		</testng>
+	</target>
+	
+	<target name="main" depends="compileSrc">
+		<description>Main target</description>
+	</target>
+	
+	<target name="full" depends="main, test, jar, docs">
+		<description>Runs Main + unittest + generates jar, docs</description>
+	</target>
+
+</project> 

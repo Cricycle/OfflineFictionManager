@@ -40,6 +40,12 @@
 	<!-- Compiles the java source code -->
 	<target name="compileSrc" depends="clean, makedir">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" />
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml" />
+				<include name="**/*.xsd" />
+			</fileset>
+		</copy>
 	</target>
 	
 	<!-- Compiles the TestNG unit test source files -->

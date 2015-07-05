@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<DiscoveryManager>
+	<intproperty name="maxRequestsPerMinuteRate" value="10" />
+	<intproperty name="maxDiscoverLimitPerSession" value="20" />
+</DiscoveryManager>

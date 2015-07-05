@@ -1,11 +1,11 @@
 package alex.offlinefictionmanager.discovery;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashMap;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -16,8 +16,15 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -70,8 +77,10 @@ public class DiscoveryManager
 	{
 		try
 		{
-			URL schemaFile = new File(DiscoveryManager.ConfigurationSchemaFile).toURI().toURL();
-			Source xmlFile = new StreamSource(new File(DiscoveryManager.ConfigurationFile));
+			// URL schemaFile = new File(DiscoveryManager.ConfigurationSchemaFile).toURI().toURL();
+			URL schemaFile = this.getClass().getResource(DiscoveryManager.ConfigurationSchemaFile);
+			// Source xmlFile = new StreamSource(new File(DiscoveryManager.ConfigurationFile));
+			Source xmlFile = new StreamSource(this.getClass().getResourceAsStream(DiscoveryManager.ConfigurationFile));
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(schemaFile);
 			Validator validator = schema.newValidator();
@@ -88,10 +97,14 @@ public class DiscoveryManager
 				throw new RuntimeException(e);
 			}
 
-			File fXmlFile = new File(DiscoveryManager.ConfigurationFile);
+			// File fXmlFile = new File(DiscoveryManager.ConfigurationFile);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
+			Document doc = dBuilder.parse(this.getClass().getResourceAsStream(DiscoveryManager.ConfigurationFile));
+
+			HashMap<String, String> nameValueMap = new HashMap<String, String>();
+			HashMap<String, String> nameTypeMap = new HashMap<String, String>();
+			getDiscoveryManagerProperties(doc, nameValueMap, nameTypeMap);
 
 			Field[] fields = this.getClass().getDeclaredFields();
 			for (Field f : fields)
@@ -101,7 +114,7 @@ public class DiscoveryManager
 					String fieldName = f.getName();
 					try
 					{
-						f.setInt(this, 2);
+						f.setInt(this, Integer.parseInt(nameValueMap.get(fieldName)));
 					}
 					catch (IllegalArgumentException | IllegalAccessException e)
 					{
@@ -117,6 +130,32 @@ public class DiscoveryManager
 			throw new RuntimeException(e);
 		}
 
+	}
+
+	private void getDiscoveryManagerProperties(Document doc, HashMap<String, String> nameValueMap,
+		HashMap<String, String> nameTypeMap)
+	{
+		XPathFactory xpathFactory = XPathFactory.newInstance();
+		XPath xpath = xpathFactory.newXPath();
+
+		try
+		{
+			XPathExpression expr = xpath.compile("/DiscoveryManager/intproperty");
+			NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+			for (int i = 0; i < nodes.getLength(); ++i)
+			{
+				Element e = (Element) (nodes.item(i));
+				String name = e.getAttribute("name");
+				String value = e.getAttribute("value");
+				nameValueMap.put(name, value);
+				nameTypeMap.put(name, "int");
+			}
+		}
+		catch (XPathExpressionException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void Discover()

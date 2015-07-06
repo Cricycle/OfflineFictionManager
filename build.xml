@@ -39,11 +39,13 @@
 
 	<!-- Compiles the java source code -->
 	<target name="compileSrc" depends="clean, makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" />
+		<javac 	srcdir="${src.dir}"
+				destdir="${build.dir}"
+				classpath="external_lib/jsoup-1.8.2/jsoup-1.8.2.jar;${build.dir}"
+				includeantruntime="false" />
 		<copy todir="${build.dir}">
 			<fileset dir="${src.dir}">
-				<include name="**/*.xml" />
-				<include name="**/*.xsd" />
+				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
 	</target>
@@ -52,7 +54,7 @@
 	<target name="compileTest" depends="compileSrc">
 		<javac 	srcdir="${test.dir}"
 				destdir="${testbuild.dir}"
-				classpath="external_lib/testng/testng.jar;${build.dir}"
+				classpath="external_lib/testng/testng.jar;external_lib/jsoup-1.8.2/jsoup-1.8.2.jar;${build.dir}"
 				includeantruntime="false" />
 	</target>
 

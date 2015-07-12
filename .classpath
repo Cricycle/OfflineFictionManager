@@ -7,5 +7,10 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/OfflineFictionManager/external_lib/jsoup-1.8.2/jsoup-1.8.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="com.microsoft.sqljdbc4.DRIVER_JAVAEE6/4.0.2206">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

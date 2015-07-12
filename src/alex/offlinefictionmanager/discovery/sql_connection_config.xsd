@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:complexType name="SqlConnectionType">
+    	<xs:sequence>
+    		<xs:element name="server" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="database" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="username" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="password" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="encrypt" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+    		<xs:element name="hostNameInCertificate" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+
+    <xs:element name="SqlConnection" type="SqlConnectionType"></xs:element>
+</xs:schema>
